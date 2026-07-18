@@ -95,7 +95,13 @@
 
 ---
 
-### 📊 GitHub Stats
+### 📊 Coding Stats
+
+<sub>Click a tab to expand it — GitHub is open by default.</sub>
+
+<details open>
+<summary><b>🐙 GitHub</b></summary>
+<br>
 
 <p align="center">
   <img height="165" src="https://github-readme-stats.vercel.app/api?username=sarthak310104&show_icons=true&hide_border=true&count_private=true&bg_color=0D1117&title_color=FF8C00&icon_color=FF8C00&text_color=C9D1D9" alt="Sarthak's GitHub stats" />
@@ -109,6 +115,32 @@
 <p align="center">
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=sarthak310104&hide_border=true&bg_color=0D1117&color=FF8C00&line=FF8C00&point=FFFFFF&area=true&area_color=FF8C00" alt="Contribution Graph" />
 </p>
+
+</details>
+
+<details>
+<summary><b>🟧 LeetCode</b></summary>
+<br>
+
+<p align="center">
+  <a href="https://leetcode.com/sarthak310104">
+    <img src="https://leetcard.jacoblin.cool/sarthak310104?theme=dark&font=Karma&ext=activity&colors=0D1117,0D1117,FF8C00,C9D1D9,FF8C00,FF8C00,FF8C00,FF8C00" alt="LeetCode Stats" />
+  </a>
+</p>
+
+</details>
+
+<details>
+<summary><b>🍳 CodeChef</b></summary>
+<br>
+
+<p align="center">
+  <a href="https://www.codechef.com/users/galahad_3101">
+    <img src="https://cp-logo.vercel.app/codechef/galahad_3101?logo=true" alt="CodeChef Stats" />
+  </a>
+</p>
+
+</details>
 
 ---
 
