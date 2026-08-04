@@ -1,6 +1,9 @@
+import Reveal from "./Reveal";
+
 export default function About() {
   return (
     <section id="about">
+      <Reveal>
       <div className="wrap" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
         <div>
           <p className="eyebrow">about</p>
@@ -36,6 +39,7 @@ export default function About() {
           </div>
         </div>
       </div>
+      </Reveal>
       <style>{`
         @media (max-width: 720px) {
           #about .wrap { grid-template-columns: 1fr !important; }

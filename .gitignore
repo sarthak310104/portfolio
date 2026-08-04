@@ -4,3 +4,15 @@ out
 .env*.local
 .DS_Store
 *.tsbuildinfo
+.vercel
+
+# large/raw media you don't want in git history
+# (commit optimized/used assets normally; ignore raw sources)
+*.mov
+*.mp4
+/public/raw/
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea

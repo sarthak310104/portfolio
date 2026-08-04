@@ -17,9 +17,12 @@ const ROWS = [
   },
 ];
 
+import Reveal from "./Reveal";
+
 export default function Experience() {
   return (
     <section id="experience">
+      <Reveal>
       <div className="wrap">
         <p className="eyebrow">experience</p>
         <h2 style={{ marginBottom: 32 }}>ps aux --backend</h2>
@@ -79,6 +82,7 @@ export default function Experience() {
           </div>
         </div>
       </div>
+      </Reveal>
     </section>
   );
 }

@@ -5,9 +5,12 @@ const LINKS = [
   { label: "leetcode", value: "leetcode.com/u/sarthak310104", href: "https://leetcode.com/u/sarthak310104" },
 ];
 
+import Reveal from "./Reveal";
+
 export default function Contact() {
   return (
     <section id="contact">
+      <Reveal>
       <div className="wrap">
         <p className="eyebrow">contact</p>
         <h2 style={{ marginBottom: 32 }}>mail --compose</h2>
@@ -47,6 +50,7 @@ export default function Contact() {
           </div>
         </div>
       </div>
+      </Reveal>
     </section>
   );
 }

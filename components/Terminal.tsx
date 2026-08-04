@@ -7,7 +7,7 @@ type Line = { prompt?: boolean; text: string; color?: string };
 const INTRO = [
   "whoami",
   "sarthak painuli — backend engineer, bengaluru",
-  "building payment infra @ juspay. previously nxp semiconductors.",
+  "most recently built payment infra @ juspay. before that, nxp semiconductors.",
   "stack: java · spring boot · python · fastapi · postgres · redis",
   "",
   "type 'help' to see available commands",
@@ -133,7 +133,7 @@ export default function Terminal() {
 
   return (
     <div
-      className="win"
+      className="win scanlines flicker-in"
       onClick={() => inputRef.current?.focus()}
       style={{ cursor: "text" }}
     >
@@ -154,6 +154,7 @@ export default function Terminal() {
           }}
         >
           <span
+            className="live-dot"
             style={{
               width: 6,
               height: 6,
