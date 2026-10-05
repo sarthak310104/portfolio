@@ -1,34 +1,16 @@
 const ITEMS = [
-  "java", "spring boot", "python", "fastapi", "node.js", "postgresql",
-  "redis", "docker", "react", "next.js", "typescript", "aws",
+  "python", "fastapi", "django", "java", "node.js", "postgresql", "timescaledb",
+  "redis", "celery", "docker", "react", "next.js", "typescript", "aws", "opentelemetry",
 ];
 
 export default function Marquee() {
   const doubled = [...ITEMS, ...ITEMS];
   return (
-    <div
-      className="marquee-viewport mono"
-      style={{
-        overflow: "hidden",
-        borderTop: "1px solid var(--border)",
-        borderBottom: "1px solid var(--border)",
-        padding: "12px 0",
-      }}
-    >
-      <div className="marquee-track" style={{ gap: 40 }}>
+    <div className="marquee-viewport mono">
+      <div className="marquee-track">
         {doubled.map((item, i) => (
-          <span
-            key={i}
-            style={{
-              fontSize: 13,
-              color: "var(--text-muted)",
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              whiteSpace: "nowrap",
-            }}
-          >
-            <span style={{ color: "var(--amber)" }}>#</span>
+          <span key={i} className="marquee-item">
+            <span className="marquee-glyph">◆</span>
             {item}
           </span>
         ))}

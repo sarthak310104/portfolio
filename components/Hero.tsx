@@ -1,83 +1,66 @@
-"use client";
-
-import { useRef } from "react";
-import Image from "next/image";
 import Terminal from "./Terminal";
 import Marquee from "./Marquee";
 
 export default function Hero() {
-  const spotRef = useRef<HTMLDivElement>(null);
-
-  function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    spotRef.current?.style.setProperty("--x", `${x}%`);
-    spotRef.current?.style.setProperty("--y", `${y}%`);
-  }
-
   return (
-    <section
-      id="top"
-      onMouseMove={onMouseMove}
-      style={{ borderTop: "none", paddingTop: 64, position: "relative", overflow: "hidden" }}
-    >
-      <div ref={spotRef} className="spotlight" />
-      <div className="wrap" style={{ position: "relative" }}>
-        <div className="hero-top">
-          <div className="fade-up-stagger">
-            <p className="eyebrow" style={{ animationDelay: "0ms" }}>
-              backend engineer / bengaluru
-            </p>
-            <h1
-              style={{ fontSize: 40, lineHeight: 1.25, marginBottom: 16, animationDelay: "90ms" }}
-            >
-              I build the parts of the system that aren&apos;t supposed to break.
-            </h1>
-            <p
-              style={{
-                color: "var(--text-secondary)",
-                fontSize: 16,
-                marginBottom: 32,
-                animationDelay: "180ms",
-              }}
-            >
-              Backend engineer, most recently building payment infrastructure
-              at Juspay. This terminal actually works — try typing into it.
-            </p>
-            <div style={{ display: "flex", gap: 12, animationDelay: "270ms" }}>
-              <a href="#projects" className="btn">
-                ./view-projects
-              </a>
-              <a href="#contact" className="btn btn-violet">
-                ./get-in-touch
-              </a>
-            </div>
+    <section id="top" className="hero">
+      <div className="wrap hero-grid">
+        <div className="hero-copy fade-up-stagger">
+          <div className="hud-chip mono" style={{ animationDelay: "0ms" }}>
+            <span className="live-dot" /> OPEN TO WORK // BLR-IN
           </div>
-
-          <div className="hero-photo win">
-            <div className="win-bar">
-              <span className="win-dot" style={{ background: "#e0605080" }} />
-              <span className="win-dot" style={{ background: "#e0a95080" }} />
-              <span className="win-dot" style={{ background: "#50c07880" }} />
-              <span className="win-title">sarthak.jpg</span>
+          <h1 className="hero-title" style={{ animationDelay: "90ms" }}>
+            I build the parts
+            <br />
+            of the system that
+            <br />
+            <span className="grad-text glitch" data-text="aren't supposed to break.">
+              aren&apos;t supposed to break.
+            </span>
+          </h1>
+          <p className="hero-sub" style={{ animationDelay: "180ms" }}>
+            Software engineer, previously on payments at Juspay. Right now I&apos;m
+            building Ghost Protocol, a behavioral digital twin that watches how
+            production systems actually behave. The terminal below is real; try typing into it.
+          </p>
+          <div className="hero-cta" style={{ animationDelay: "270ms" }}>
+            <a href="#project-ghost-protocol-emp" className="btn btn-primary">
+              <span>launch ghost protocol</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a href="#contact" className="btn btn-ghost">
+              open a channel
+            </a>
+          </div>
+          <div className="hero-stats mono" style={{ animationDelay: "360ms" }}>
+            <div>
+              <b>23k</b>
+              <span>spans/sec ingested</span>
             </div>
-            <Image
-              src="/sarthak.jpg"
-              alt="Sarthak Painuli"
-              width={460}
-              height={570}
-              priority
-              style={{ width: "100%", height: "auto", display: "block" }}
-            />
+            <div>
+              <b>&lt;14ms</b>
+              <span>p95 api reads</span>
+            </div>
+            <div>
+              <b>1y</b>
+              <span>in production payments</span>
+            </div>
           </div>
         </div>
 
-        <div style={{ animationDelay: "360ms", marginTop: 32 }}>
-          <Terminal />
+        {/* the 3D core renders behind this column; these are just HUD labels over it */}
+        <div className="hero-hud mono" aria-hidden="true">
+          <div className="reticle" />
+          <span className="hud-label l1">CORE.SYS // v2026.10</span>
+          <span className="hud-label l2">ORBIT 03 · STABLE</span>
+          <span className="hud-label l3">LAT 12.97 N · LON 77.59 E</span>
         </div>
       </div>
-      <div style={{ marginTop: 56 }}>
+
+      <div className="wrap" style={{ marginTop: 56 }}>
+        <Terminal />
+      </div>
+      <div style={{ marginTop: 72 }}>
         <Marquee />
       </div>
     </section>

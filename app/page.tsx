@@ -16,9 +16,10 @@ export default function Home() {
         <Projects />
         <Contact />
       </main>
-      <footer style={{ borderTop: "1px solid var(--border)", padding: "24px 0" }}>
-        <div className="wrap mono" style={{ fontSize: 12, color: "var(--text-muted)" }}>
-          built with next.js — last deploy: {new Date().getFullYear()}
+      <footer className="footer">
+        <div className="wrap mono">
+          <span>built with next.js + three.js</span>
+          <span>© {new Date().getFullYear()} sarthak painuli // end of transmission</span>
         </div>
       </footer>
     </>

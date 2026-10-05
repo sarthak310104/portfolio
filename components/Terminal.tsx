@@ -2,233 +2,284 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Line = { prompt?: boolean; text: string; color?: string };
+type Line = { prompt?: boolean; text: string; tone?: "ok" | "warn" | "accent" | "muted" | "hot" };
 
-const INTRO = [
-  "whoami",
-  "sarthak painuli — backend engineer, bengaluru",
-  "most recently built payment infra @ juspay. before that, nxp semiconductors.",
-  "stack: java · spring boot · python · fastapi · postgres · redis",
-  "",
-  "type 'help' to see available commands",
+const RESUME = "/Sarthak_Painuli_Resume.pdf";
+
+const BOOT: Line[] = [
+  { text: "[ OK ] mounting /dev/sarthak", tone: "ok" },
+  { text: "[ OK ] loading modules: backend, frontend, infra, ai", tone: "ok" },
+  { text: "[ OK ] linking ghost-protocol telemetry", tone: "ok" },
+  { text: "[ -- ] uplink: bengaluru, IN // open to relocation", tone: "muted" },
 ];
 
-const HELP = [
-  "available commands:",
-  "  about        jump to background",
-  "  experience   jump to work history",
-  "  projects     jump to projects",
-  "  contact      jump to contact",
-  "  resume       open resume",
-  "  clear        clear the screen",
+const WHOAMI: Line[] = [
+  { text: "sarthak painuli: software engineer, bengaluru", tone: "accent" },
+  { text: "ex product engineer @ juspay (payments). before that, nxp semiconductors." },
+  { text: "stack: python · fastapi · java · node.js · postgres · redis · next.js" },
+  { text: "currently: building ghost protocol, a behavioral twin for production systems" },
 ];
+
+const HELP: Line[] = [
+  { text: "available commands:", tone: "accent" },
+  { text: "  whoami       who's on the other end" },
+  { text: "  neofetch     system readout" },
+  { text: "  ghost        jump to ghost protocol" },
+  { text: "  projects     jump to projects" },
+  { text: "  experience   jump to work history" },
+  { text: "  about        jump to background" },
+  { text: "  contact      open a channel" },
+  { text: "  resume       download resume" },
+  { text: "  clear        clear the screen" },
+  { text: "  tip: tab completes, ↑/↓ walks history", tone: "muted" },
+];
+
+const NEOFETCH: Line[] = [
+  { text: "   ▲        sarthak@core", tone: "accent" },
+  { text: "  ▲ ▲       ─────────────────" },
+  { text: " ▲   ▲      os:      human (bengaluru build)" },
+  { text: "▲▲▲▲▲▲▲     role:    software engineer" },
+  { text: "            focus:   distributed systems, observability, apis" },
+  { text: "            uptime:  ~1y professional, coding since b.tech cse (2021)" },
+  { text: "            flagship: ghost protocol", tone: "hot" },
+];
+
+const COMMANDS = ["help", "whoami", "neofetch", "ghost", "projects", "experience", "about", "contact", "resume", "clear", "sudo hire-me"];
+const CHIPS = ["help", "neofetch", "ghost", "projects", "resume"];
 
 function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function pulse() {
+  window.dispatchEvent(new Event("holo:pulse"));
 }
 
 export default function Terminal() {
   const [lines, setLines] = useState<Line[]>([]);
   const [typed, setTyped] = useState("");
-  const [introDone, setIntroDone] = useState(false);
+  const [ready, setReady] = useState(false);
   const [input, setInput] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
+  const [hIdx, setHIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
+  // boot sequence, then type "whoami"
   useEffect(() => {
     let cancelled = false;
-    let i = 0;
-    let char = 0;
-    const fullLine = "$ " + INTRO[0];
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const later = (fn: () => void, ms: number) => timers.push(setTimeout(() => !cancelled && fn(), ms));
 
-    function step() {
-      if (cancelled) return;
-      if (char <= fullLine.length) {
-        setTyped(fullLine.slice(0, char));
-        char++;
-        setTimeout(step, 28);
-      } else {
-        setLines([{ prompt: true, text: INTRO[0] }]);
-        setTyped("");
-        i = 1;
-        setTimeout(printRest, 200);
-      }
+    let t = 150;
+    BOOT.forEach((l) => {
+      later(() => setLines((p) => [...p, l]), t);
+      t += 220;
+    });
+    const cmd = "whoami";
+    for (let c = 1; c <= cmd.length; c++) {
+      later(() => setTyped(cmd.slice(0, c)), t + c * 55);
     }
+    t += cmd.length * 55 + 200;
+    later(() => {
+      setTyped("");
+      setLines((p) => [...p, { prompt: true, text: cmd }]);
+    }, t);
+    WHOAMI.forEach((l, i) => later(() => setLines((p) => [...p, l]), t + 90 * (i + 1)));
+    later(() => {
+      setLines((p) => [...p, { text: "type 'help' or tap a command below", tone: "muted" }]);
+      setReady(true);
+    }, t + 90 * (WHOAMI.length + 1));
 
-    function printRest() {
-      if (cancelled) return;
-      if (i < INTRO.length) {
-        setLines((prev) => [...prev, { text: INTRO[i] }]);
-        i++;
-        setTimeout(printRest, 90);
-      } else {
-        setIntroDone(true);
-      }
-    }
-
-    step();
     return () => {
       cancelled = true;
+      timers.forEach(clearTimeout);
     };
   }, []);
 
   useEffect(() => {
-    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
+    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
   }, [lines, typed]);
 
-  function runCommand(raw: string) {
+  function print(ls: Line[]) {
+    setLines((p) => [...p, ...ls]);
+  }
+
+  function run(raw: string) {
     const cmd = raw.trim().toLowerCase();
-    setLines((prev) => [...prev, { prompt: true, text: raw }]);
+    setLines((p) => [...p, { prompt: true, text: raw }]);
     if (!cmd) return;
+    setHistory((h) => [raw, ...h].slice(0, 30));
+    setHIdx(-1);
+    pulse();
+
+    const jump = (id: string, label: string) => {
+      print([{ text: `→ routing to ${label}`, tone: "ok" }]);
+      setTimeout(() => scrollToId(id), 250);
+    };
 
     switch (cmd) {
       case "help":
-        setLines((prev) => [...prev, ...HELP.map((t) => ({ text: t }))]);
-        break;
-      case "about":
-      case "cd about":
-        setLines((prev) => [...prev, { text: "→ scrolling to about" }]);
-        scrollToId("about");
-        break;
-      case "experience":
-      case "cd experience":
-        setLines((prev) => [...prev, { text: "→ scrolling to experience" }]);
-        scrollToId("experience");
-        break;
+      case "ls":
+        return print(HELP);
+      case "whoami":
+        return print(WHOAMI);
+      case "neofetch":
+        return print(NEOFETCH);
+      case "ghost":
+      case "ghost-protocol":
+        return jump("project-ghost-protocol-emp", "ghost protocol");
       case "projects":
       case "cd projects":
       case "ls projects":
-        setLines((prev) => [...prev, { text: "→ scrolling to projects" }]);
-        scrollToId("projects");
-        break;
+        return jump("projects", "projects");
+      case "experience":
+      case "cd experience":
+        return jump("experience", "experience");
+      case "about":
+      case "cd about":
+        return jump("about", "about");
       case "contact":
       case "cd contact":
-        setLines((prev) => [...prev, { text: "→ scrolling to contact" }]);
-        scrollToId("contact");
-        break;
+        return jump("contact", "contact");
       case "resume":
-        setLines((prev) => [...prev, { text: "→ opening resume in a new tab" }]);
-        window.open("/resume.pdf", "_blank");
-        break;
+        print([{ text: "→ opening resume in a new tab", tone: "ok" }]);
+        window.open(RESUME, "_blank");
+        return;
       case "sudo hire-me":
-        setLines((prev) => [
-          ...prev,
-          { text: "permission granted. scrolling to contact", color: "var(--live)" },
-        ]);
-        scrollToId("contact");
-        break;
+        print([{ text: "access granted. opening a channel.", tone: "hot" }]);
+        setTimeout(() => scrollToId("contact"), 300);
+        return;
       case "clear":
         setLines([]);
-        break;
-      case "whoami":
-        setLines((prev) => [...prev, ...INTRO.map((t) => ({ text: t }))]);
-        break;
+        return;
       default:
-        setLines((prev) => [
-          ...prev,
-          { text: `command not found: ${cmd} — try 'help'`, color: "var(--text-muted)" },
-        ]);
+        print([{ text: `command not found: ${cmd}. try 'help'`, tone: "warn" }]);
     }
   }
 
+  function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      run(input);
+      setInput("");
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      const hit = COMMANDS.find((c) => c.startsWith(input.trim().toLowerCase()) && input.trim());
+      if (hit) setInput(hit);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const n = Math.min(hIdx + 1, history.length - 1);
+      if (history[n] !== undefined) {
+        setHIdx(n);
+        setInput(history[n]);
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const n = hIdx - 1;
+      setHIdx(Math.max(n, -1));
+      setInput(n >= 0 ? history[n] : "");
+    }
+  }
+
+  // 3D tilt toward the cursor
+  function onMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = panelRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--rx", `${(-y * 6).toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${(x * 8).toFixed(2)}deg`);
+    el.style.setProperty("--gx", `${(x + 0.5) * 100}%`);
+    el.style.setProperty("--gy", `${(y + 0.5) * 100}%`);
+  }
+  function onLeave() {
+    const el = panelRef.current;
+    el?.style.setProperty("--rx", "0deg");
+    el?.style.setProperty("--ry", "0deg");
+  }
+
+  const suggestion =
+    input.trim() && COMMANDS.find((c) => c.startsWith(input.trim().toLowerCase()) && c !== input.trim().toLowerCase());
+
   return (
-    <div
-      className="win scanlines flicker-in"
-      onClick={() => inputRef.current?.focus()}
-      style={{ cursor: "text" }}
-    >
-      <div className="win-bar">
-        <span className="win-dot" style={{ background: "#e0605080" }} />
-        <span className="win-dot" style={{ background: "#e0a95080" }} />
-        <span className="win-dot" style={{ background: "#50c07880" }} />
-        <span className="win-title">intro.sh — zsh</span>
-        <span
-          className="mono"
-          style={{
-            marginLeft: "auto",
-            fontSize: 11,
-            color: "var(--live)",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <span
-            className="live-dot"
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: "var(--live)",
-              display: "inline-block",
-            }}
-          />
-          live
-        </span>
-      </div>
-      <div
-        ref={bodyRef}
-        className="mono"
-        style={{
-          padding: "20px 20px 16px",
-          fontSize: 14,
-          minHeight: 260,
-          maxHeight: 340,
-          overflowY: "auto",
-        }}
-      >
-        {lines.map((l, idx) => (
-          <div
-            key={idx}
-            style={{
-              color: l.color ?? (l.prompt ? "var(--text-primary)" : "var(--text-secondary)"),
-              marginBottom: 4,
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {l.prompt ? <span style={{ color: "var(--amber)" }}>$ </span> : null}
-            {l.text}
-          </div>
-        ))}
-        {typed && (
-          <div style={{ color: "var(--text-primary)" }}>
-            <span style={{ color: "var(--amber)" }}>{typed}</span>
-            <span className="cursor-blink">▌</span>
-          </div>
-        )}
-        {introDone && (
-          <div style={{ display: "flex", alignItems: "center", color: "var(--text-primary)" }}>
-            <span style={{ color: "var(--amber)", marginRight: 6 }}>$</span>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  runCommand(input);
-                  setInput("");
-                }
+    <div className="holo-stage" onMouseMove={onMove} onMouseLeave={onLeave}>
+      <div ref={panelRef} className="holo-term hud" onClick={() => inputRef.current?.focus()}>
+        <span className="hud-c tl" />
+        <span className="hud-c tr" />
+        <span className="hud-c bl" />
+        <span className="hud-c br" />
+        <div className="holo-glare" />
+        <div className="holo-scan" />
+
+        <div className="holo-bar mono">
+          <span className="holo-tag">[ SYS.TERM ]</span>
+          <span className="holo-title">intro.sh // tty0</span>
+          <span className="holo-meter" aria-hidden="true">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <i key={i} style={{ animationDelay: `${i * 90}ms` }} />
+            ))}
+          </span>
+          <span className="holo-live">
+            <span className="live-dot" /> online
+          </span>
+        </div>
+
+        <div ref={bodyRef} className="holo-body mono">
+          {lines.map((l, i) => (
+            <div key={i} className={`tl tone-${l.tone ?? (l.prompt ? "prompt" : "base")}`}>
+              {l.prompt && <span className="ps1">sarthak@core:~$ </span>}
+              {l.text}
+            </div>
+          ))}
+          {typed && (
+            <div className="tl tone-prompt">
+              <span className="ps1">sarthak@core:~$ </span>
+              {typed}
+              <span className="caret">▌</span>
+            </div>
+          )}
+          {ready && (
+            <div className="holo-input">
+              <span className="ps1">sarthak@core:~$</span>
+              <div className="holo-input-wrap">
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKey}
+                  spellCheck={false}
+                  autoComplete="off"
+                  aria-label="terminal command input"
+                />
+                {suggestion && (
+                  <span className="ghost-hint" aria-hidden="true">
+                    <span style={{ visibility: "hidden" }}>{input}</span>
+                    {suggestion.slice(input.trim().length)}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="holo-chips mono">
+          {CHIPS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              disabled={!ready}
+              onClick={(e) => {
+                e.stopPropagation();
+                run(c);
               }}
-              autoFocus
-              spellCheck={false}
-              aria-label="terminal command input"
-              style={{
-                flex: 1,
-                background: "transparent",
-                border: "none",
-                outline: "none",
-                color: "var(--text-primary)",
-                fontFamily: "var(--mono)",
-                fontSize: 14,
-              }}
-            />
-          </div>
-        )}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
       </div>
-      <style>{`
-        .cursor-blink { animation: blink 1s step-start infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-      `}</style>
     </div>
   );
 }

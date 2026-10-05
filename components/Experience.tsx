@@ -4,34 +4,42 @@ const ROWS = [
     proc: "juspay/product-engineer",
     time: "08/2025–06/2026",
     status: "exited",
-    detail:
-      "Built a multi-method checkout flow and 6+ end-to-end transaction flows (3DS auth, refund, capture, webhook ingestion) across 3+ payment providers, raising processing throughput 70%.",
+    bullets: [
+      "Built Google Wallet and Apple Pay support into a merchant checkout screen as part of a multi-payment-method redesign, making the implementation config-driven across merchants.",
+      "Owned 6+ transaction flows end to end, including initiation, 3DS authentication, refunds, captures, and webhook ingestion, across 3+ payment providers, building APIs and business logic for payment processing.",
+      "Worked with the platform team to optimize backend modules in the payment flow's critical path, reducing redundant processing and improving load times and overall application performance by 15%.",
+      "Built an MCP-based personalization tool that uses an LLM to fetch a prospective merchant's brand colors, logo, and currency and apply them to demo checkout configurations.",
+    ],
   },
   {
     pid: "0042",
     proc: "nxp/web-dev-intern",
     time: "07/2024–06/2025",
     status: "exited",
-    detail:
-      "Shipped 8+ internal full-stack tools including a lab inventory system handling 100K+ tools; grew adoption of an internal dev-tooling platform by 40%.",
+    bullets: [
+      "Built 8+ internal tools using Java, JSP, and SQL, replacing manual workflows across multiple teams and working directly with stakeholders to define requirements.",
+      "Designed a lab inventory and booking system for tracking and reserving 100K+ tools in real time, adding database indexes for fast availability lookups and logic to prevent double-booking.",
+      "Reworked core workflows on an internal dev tooling platform, fixing reliability issues that had been blocking adoption, and grew usage by 40%.",
+    ],
   },
 ];
 
 import Reveal from "./Reveal";
+import SectionHead from "./SectionHead";
 
 export default function Experience() {
   return (
     <section id="experience">
       <Reveal>
       <div className="wrap">
-        <p className="eyebrow">experience</p>
-        <h2 style={{ marginBottom: 32 }}>ps aux --backend</h2>
-        <div className="win">
+        <SectionHead index="02" eyebrow="experience" title="ps aux --work" />
+        <div className="win exp-win">
           <div className="win-bar">
-            <span className="win-dot" style={{ background: "#e0605080" }} />
-            <span className="win-dot" style={{ background: "#e0a95080" }} />
-            <span className="win-dot" style={{ background: "#50c07880" }} />
+            <span className="win-dot" />
+            <span className="win-dot" />
+            <span className="win-dot" />
             <span className="win-title">work-history</span>
+            <span className="holo-tag mono" style={{ marginLeft: "auto" }}>2 PROCESSES</span>
           </div>
           <div style={{ padding: "8px 0" }}>
             <div
@@ -66,17 +74,11 @@ export default function Experience() {
                   <span style={{ color: "var(--text-secondary)" }}>{r.time}</span>
                   <span style={{ color: "var(--text-muted)" }}>{r.status}</span>
                 </div>
-                <p
-                  style={{
-                    margin: "10px 0 0",
-                    fontSize: 14,
-                    color: "var(--text-secondary)",
-                    lineHeight: 1.6,
-                    gridColumn: "1 / -1",
-                  }}
-                >
-                  {r.detail}
-                </p>
+                <ul className="exp-bullets">
+                  {r.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
