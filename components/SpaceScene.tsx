@@ -29,13 +29,14 @@ export default function SpaceScene() {
     mount.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x03050c, 0.035);
+    scene.fog = new THREE.FogExp2(0x050505, 0.04);
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
     camera.position.set(0, 0, 12);
 
-    const CYAN = new THREE.Color("#4cf0ff");
-    const VIOLET = new THREE.Color("#8b5cff");
-    const MAGENTA = new THREE.Color("#ff3df2");
+    const CYAN = new THREE.Color("#39ff6e");
+    const VIOLET = new THREE.Color("#5a5a5a"); // neutral grey secondary
+    const MAGENTA = new THREE.Color("#39ff6e");
+    const WHITE = new THREE.Color("#d8d8d8");
 
     // ---------- core ----------
     const core = new THREE.Group();
@@ -49,7 +50,7 @@ export default function SpaceScene() {
 
     const innerGlow = new THREE.Mesh(
       new THREE.IcosahedronGeometry(1.0, 3),
-      new THREE.MeshBasicMaterial({ color: VIOLET, transparent: true, opacity: 0.18 })
+      new THREE.MeshBasicMaterial({ color: 0x0c0c0c, transparent: true, opacity: 0.6 })
     );
     core.add(innerGlow);
 
@@ -77,7 +78,7 @@ export default function SpaceScene() {
             float f = pow(1.0 - max(dot(vN, vV), 0.0), 2.6);
             float bands = smoothstep(0.92, 1.0, sin(vP.y * 9.0 - uTime * 1.6) * 0.5 + 0.5) * 0.35;
             vec3 col = mix(uA, uB, vP.y * 0.25 + 0.5);
-            gl_FragColor = vec4(col, f * 0.9 + bands * f);
+            gl_FragColor = vec4(col, f * 0.32 + bands * f * 0.4);
           }`,
       })
     );
@@ -114,7 +115,7 @@ export default function SpaceScene() {
     };
     makeRing(2.7, CYAN, [Math.PI / 2.4, 0.2], true);
     makeRing(3.25, VIOLET, [Math.PI / 1.8, -0.5], false);
-    makeRing(3.8, CYAN, [Math.PI / 2.1, 0.9], false);
+    makeRing(3.8, VIOLET, [Math.PI / 2.1, 0.9], false);
 
     // satellites riding the rings
     const sats: { mesh: THREE.Mesh; ring: THREE.Object3D; r: number; speed: number; phase: number }[] = [];
@@ -138,7 +139,7 @@ export default function SpaceScene() {
       pos[i * 3] = (Math.random() - 0.5) * 70;
       pos[i * 3 + 1] = (Math.random() - 0.5) * 70;
       pos[i * 3 + 2] = -Math.random() * 60 + 6;
-      const c = Math.random() < 0.7 ? CYAN : Math.random() < 0.5 ? VIOLET : MAGENTA;
+      const c = Math.random() < 0.82 ? WHITE : CYAN;
       col[i * 3] = c.r;
       col[i * 3 + 1] = c.g;
       col[i * 3 + 2] = c.b;
@@ -152,7 +153,7 @@ export default function SpaceScene() {
         size: 0.06,
         vertexColors: true,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.55,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
       })
@@ -160,10 +161,10 @@ export default function SpaceScene() {
     scene.add(particles);
 
     // ---------- grid floor ----------
-    const grid = new THREE.GridHelper(120, 80, VIOLET, CYAN);
+    const grid = new THREE.GridHelper(120, 80, 0x2a2a2a, 0x1a1a1a);
     const gMat = grid.material as THREE.Material;
     gMat.transparent = true;
-    gMat.opacity = 0.16;
+    gMat.opacity = 0.5;
     grid.position.set(0, -5.5, -20);
     scene.add(grid);
 
@@ -233,7 +234,7 @@ export default function SpaceScene() {
       const s = 1 + Math.sin(t * 2) * 0.03 + pulse * 0.25;
       inner.scale.setScalar(s);
       innerGlow.scale.setScalar(1 + Math.sin(t * 1.3) * 0.08 + pulse * 0.4);
-      (innerGlow.material as THREE.MeshBasicMaterial).opacity = 0.18 + pulse * 0.5;
+      (innerGlow.material as THREE.MeshBasicMaterial).opacity = 0.6;
       (shell.material as THREE.ShaderMaterial).uniforms.uTime.value = t;
 
       rings[0].rotation.z = t * 0.25 * speed;

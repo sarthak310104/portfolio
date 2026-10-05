@@ -80,7 +80,7 @@ export default function MockEngineDemo() {
       <div
         className="mono"
         style={{
-          background: "#05070a",
+          background: "#050505",
           border: "1px solid var(--border)",
           borderRadius: 6,
           padding: 16,
