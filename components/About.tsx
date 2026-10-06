@@ -5,10 +5,10 @@ import TiltCard from "./TiltCard";
 
 const STACK = [
   { k: "backend", v: "Python, FastAPI, Django, Flask, Java, Node.js" },
-  { k: "data", v: "PostgreSQL, TimescaleDB, MongoDB, Redis, SQL" },
+  { k: "data", v: "PostgreSQL, VectorDB, TimescaleDB, MongoDB, Redis, SQL" },
   { k: "frontend", v: "React, Next.js, TypeScript" },
   { k: "infra", v: "Docker, AWS, Nginx, GitHub Actions" },
-  { k: "ai", v: "MCP, RAG, Gemini API, OpenAI API" },
+  { k: "ai", v: "MCP, RAG, LLM Integration, Prompt Engineering, Token Optimization" },
 ];
 
 export default function About() {
